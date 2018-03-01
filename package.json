@@ -2,7 +2,7 @@
   "name": "quick-redux",
   "version": "1.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "test": "echo \"OMG THE TESTS PASSED\"",
     "build": "rollup -c"
