@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["env", {
+      "modules": false
+    }],
+    "es2017",
+    "stage-3"
+  ],
+  "plugins": ["external-helpers"]
+}
