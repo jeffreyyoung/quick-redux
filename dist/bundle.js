@@ -48,40 +48,128 @@ function easyConnect() {
   return reactRedux.connect.apply(undefined, toConsumableArray(nextArgs));
 }
 
-var separator = '__';
-
-var createPrefixedActionMap = function createPrefixedActionMap(_ref) {
-  var actions = _ref.actions,
-      prefix = _ref.prefix;
-
-  var prefixedActionMap = {};
-  Object.keys(actions).forEach(function (actionKey) {
-    prefixedActionMap['' + prefix + separator + actionKey] = actions[actionKey];
-  });
-  return prefixedActionMap;
+var getDefWithDefaults = function getDefWithDefaults(def) {
+    return _extends({
+        defaultState: {},
+        actions: [],
+        globalActions: [],
+        key: ''
+    }, def);
 };
 
-var createActions = function createActions(_ref) {
-  var prefixedActionMap = _ref.prefixedActionMap,
-      dispatch = _ref.dispatch;
+var bindActionCreators = function bindActionCreators(_ref) {
+  var actionCreators = _ref.actionCreators,
+      dispatch = _ref.dispatch,
+      store = _ref.store,
+      def = _ref.def,
+      key = _ref.key;
+
+  var defWithDefaults = getDefWithDefaults(def);
 
   var actions = {};
-
-  Object.keys(prefixedActionMap).forEach(function (prefixedActionKey) {
-    actions[getKeyWithoutPrefix(prefixedActionKey, separator)] = function (payload) {
-      dispatch({
-        type: prefixedActionKey,
-        payload: payload
-      });
+  Object.keys(actionCreators).forEach(function (key) {
+    var createAction = actionCreators[key];
+    actions[key] = function (payload) {
+      return dispatch(createAction(payload));
     };
   });
 
+  Object.keys(defWithDefaults.asyncActions).forEach(function (asyncActionKey) {
+    actions[asyncActionKey] = function () {
+      var _defWithDefaults$asyn;
+
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return (_defWithDefaults$asyn = defWithDefaults.asyncActions)[asyncActionKey].apply(_defWithDefaults$asyn, [{ actions: actions, getState: function getState() {
+          return store.getState()[key];
+        }, store: store, dispatch: dispatch }].concat(args));
+    };
+  });
   return actions;
 };
 
-function getKeyWithoutPrefix(prefixedKey, separator$$1) {
-  return prefixedKey.substring(prefixedKey.indexOf(separator$$1) + separator$$1.length);
+var separator = '__';
+
+function validateKey(key, prefix) {
+  if (key.indexOf(separator) !== -1) {
+    throw 'Invalid action key. the action ' + key + ' for the def: ' + prefix + ' cannot contain two consecutive underscores';
+  }
 }
+
+var createActionMap = function createActionMap(defIn) {
+  var def = getDefWithDefaults(defIn);
+
+  var actionMap = {};
+  //local actions should be prefixed
+  Object.keys(def.actions).forEach(function (actionKey) {
+    validateKey(actionKey, def.key);
+    actionMap[prefixKey(actionKey, def.key)] = def.actions[actionKey];
+  });
+
+  //globalActions should not be prefixed
+  Object.keys(def.globalActions).forEach(function (actionKey) {
+    validateKey(actionKey, def.key);
+    actionMap[actionKey] = def.globalActions[actionKey];
+  });
+
+  return actionMap;
+};
+
+//adds a prefix to the action key
+var prefixKey = function prefixKey(key, prefix) {
+  return '' + prefix + separator + key;
+};
+
+function warnIfActionKeyExists(actionCreators, actionKey) {
+  if (actionCreators[actionKey]) {
+    console.warn('the following def', defIn, 'has globalActions and local actions with the same name, they should be named differently');
+  }
+}
+
+var generateActionCreators = function generateActionCreators(defIn) {
+  var def = getDefWithDefaults(defIn);
+  var actionCreators = {};
+  Object.keys(def.actions).forEach(function (actionKey) {
+    var prefixedKey = prefixKey(actionKey, def.key);
+    actionCreators[actionKey] = function (payload) {
+      return { type: prefixedKey, payload: payload };
+    };
+  });
+
+  Object.keys(def.globalActions).forEach(function (actionKey) {
+    warnIfActionKeyExists(actionCreators, actionKey);
+    actionCreators[actionKey] = function (payload) {
+      return { type: actionKey, payload: payload };
+    };
+  });
+
+  //TODO figure out async actions
+  // Object.keys(def.asyncActions).forEach(actionKey => {
+  //   actionCreators[actionKey] => 
+  // });
+
+  return actionCreators;
+};
+
+var getActions = function getActions(defs, store) {
+  var actions = {};
+
+  Object.keys(defs).forEach(function (key) {
+    var def = defs[key];
+    actions[key] = bindActionCreators({
+      actionCreators: generateActionCreators(def),
+      def: def,
+      dispatch: store.dispatch,
+      store: store,
+      key: key
+    });
+  });
+
+  registerActions(actions);
+  return actions;
+};
 
 var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -534,86 +622,31 @@ function produce(baseState, producer) {
     return getUseProxies() ? produceProxy(baseState, producer) : produceEs5(baseState, producer);
 }
 
-var createReducer = function createReducer(_ref) {
-  var prefixedActionMap = _ref.prefixedActionMap,
-      defaultState = _ref.defaultState;
+var createReducer = function createReducer(defIn) {
+  var def = getDefWithDefaults(defIn);
 
-  var reducer = function reducer(previousState, _ref2) {
-    var type = _ref2.type,
-        payload = _ref2.payload;
+  var actionMap = createActionMap(def);
+  var reducer = function reducer(previousState, _ref) {
+    var type = _ref.type,
+        payload = _ref.payload;
 
     if (!previousState) {
-      return defaultState;
+      return def.defaultState;
     }
     return produce(previousState, function (draft) {
-      var action = prefixedActionMap[type];
+      var action = actionMap[type];
       action && action(draft, payload);
     });
   };
   return reducer;
 };
 
-var createReducersAndGetActionsFunction = function createReducersAndGetActionsFunction(defs) {
+var createReducers = function createReducers(defs) {
   var reducers = {};
-  var prefixedActionMaps = {};
-
   Object.keys(defs).forEach(function (key) {
-    var _defs$key = defs[key],
-        actions = _defs$key.actions,
-        defaultState = _defs$key.defaultState;
-
-    prefixedActionMaps[key] = createPrefixedActionMap({
-      prefix: key,
-      actions: actions
-    });
-
-    reducers[key] = createReducer({
-      defaultState: defaultState,
-      prefixedActionMap: prefixedActionMaps[key]
-    });
+    return reducers[key] = createReducer(defs[key]);
   });
-
-  var getActions = function getActions(store) {
-    var actions = {};
-    var dispatch = store.dispatch.bind(store);
-    Object.keys(prefixedActionMaps).forEach(function (key) {
-      var getState = function getState() {
-        return store.getState()[key];
-      };
-      var asyncActions = defs[key].asyncActions;
-
-      //create actions
-
-      var actionsForKey = createActions({
-        dispatch: dispatch,
-        prefixedActionMap: prefixedActionMaps[key]
-      });
-
-      //add async actions
-      Object.keys(asyncActions).forEach(function (asyncActionKey) {
-        actionsForKey[asyncActionKey] = function () {
-          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-
-          asyncActions[asyncActionKey].apply(asyncActions, [{
-            actions: actionsForKey,
-            getState: getState,
-            store: store
-          }].concat(args));
-        };
-      });
-      console.log('GETTING ACTIONS FOR KEY', key, actionsForKey);
-      actions[key] = actionsForKey;
-    });
-    registerActions(actions);
-    return actions;
-  };
-
-  return {
-    reducers: reducers,
-    getActions: getActions
-  };
+  return reducers;
 };
 
 function takeKeys(obj, keys) {
@@ -638,10 +671,11 @@ function easyConnect$1() {
 
 var index = {
   connectWithActions: easyConnect,
-  createActions: createActions,
-  createPrefixedActionMap: createPrefixedActionMap,
+  getActions: getActions,
+  createActionMap: createActionMap,
+  generateActionCreators: generateActionCreators,
   createReducer: createReducer,
-  createReducersAndGetActionsFunction: createReducersAndGetActionsFunction,
+  createReducers: createReducers,
   easyConnect: easyConnect$1
 };
 

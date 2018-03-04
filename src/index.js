@@ -1,15 +1,17 @@
 import connectWithActions from './connectWithActions';
-import createActions from './createActions';
-import createPrefixedActionMap from './createPrefixedActionMap';
+import getActions from './getActions';
+import createActionMap from './createActionMap';
+import generateActionCreators from './generateActionCreators';
 import createReducer from './createReducer';
-import createReducersAndGetActionsFunction from './createReducersAndGetActionsFunction';
+import createReducers from './createReducers';
 import easyConnect from './easyConnect';
 
 export default {
   connectWithActions,
-  createActions,
-  createPrefixedActionMap,
+  getActions,
+  createActionMap,
+  generateActionCreators,
   createReducer,
-  createReducersAndGetActionsFunction,
+  createReducers,
   easyConnect
 }
