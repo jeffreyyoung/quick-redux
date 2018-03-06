@@ -1,7 +1,7 @@
 import bindActionCreators from './bindActionCreators';
 import generateActionCreators from './generateActionCreators';
 import { registerActions } from './connectWithActions';
-const getActions = (defs, store) => {
+const getActions = (defs, store, additionalParams = {}) => {
   const actions = {};
   
   Object.keys(defs).forEach(key => {
@@ -11,7 +11,8 @@ const getActions = (defs, store) => {
       def,
       dispatch: store.dispatch,
       store,
-      key
+      key,
+      ...additionalParams
     });
   });
   
