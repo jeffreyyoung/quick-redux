@@ -154,17 +154,19 @@ var generateActionCreators = function generateActionCreators(defIn) {
 };
 
 var getActions = function getActions(defs, store) {
+  var additionalParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
   var actions = {};
 
   Object.keys(defs).forEach(function (key) {
     var def = defs[key];
-    actions[key] = bindActionCreators({
+    actions[key] = bindActionCreators(_extends({
       actionCreators: generateActionCreators(def),
       def: def,
       dispatch: store.dispatch,
       store: store,
       key: key
-    });
+    }, additionalParams));
   });
 
   registerActions(actions);
