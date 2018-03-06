@@ -1,6 +1,6 @@
 import getDefWithDefaults from './getDefWithDefaults';
 
-const bindActionCreators = ({actionCreators, dispatch, store, def, key}) => {
+const bindActionCreators = ({actionCreators, dispatch, store, def, key, ...additionalArgs}) => {
   const defWithDefaults = getDefWithDefaults(def);
   
   const actions = {};
@@ -11,7 +11,7 @@ const bindActionCreators = ({actionCreators, dispatch, store, def, key}) => {
   
   Object.keys(defWithDefaults.asyncActions).forEach(asyncActionKey => {
     actions[asyncActionKey] = (...args) => defWithDefaults.asyncActions[asyncActionKey](
-      {actions, getState: () => store.getState()[key], store, dispatch},
+      {actions, getState: () => store.getState()[key], store, dispatch, ...additionalArgs},
       ...args
     );
   })
