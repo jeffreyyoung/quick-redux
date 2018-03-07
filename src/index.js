@@ -5,7 +5,7 @@ import generateActionCreators from './generateActionCreators';
 import createReducer from './createReducer';
 import createReducers from './createReducers';
 import easyConnect from './easyConnect';
-
+const connect = connectWithActions;
 export default {
   connectWithActions,
   getActions,
@@ -13,5 +13,6 @@ export default {
   generateActionCreators,
   createReducer,
   createReducers,
+  connect,
   easyConnect
 }
