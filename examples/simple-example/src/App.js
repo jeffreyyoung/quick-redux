@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'quick-redux';
 
-console.log('CONNECT!!!', connect);
-
 const App = ({count, actions}) => (
   <div>
     <p>{count}</p>
