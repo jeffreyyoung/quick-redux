@@ -27,8 +27,8 @@ const counterModule = {
     count: 0
   },
   actions: {
-    increment(currentState, num = 1) => currentState.count = currentState.count + num,
-    decrement(currentState, num = 1) => currentState.count = currentState.count - num,
+    increment: (state, num = 1) => state.count = state.count + num,
+    decrement: (state, num = 1) => state.count = state.count - num,
   },
   key: 'counter'
 }
@@ -36,10 +36,11 @@ const counterModule = {
 export default counterModule;
 ```
 
-quick-redux uses immer (https://github.com/mweststrate/immer) to modify the state.  Each action is passed the current state as it's first parameter, and then following parameters (like `num` in the above example) are what the programmer passes into the actions.
+quick-redux uses immer (https://github.com/mweststrate/immer) handle state modifications.  After modifying the state, a new state is produced with the modifications.   Each action is passed the current state as it's first parameter, and then following parameters (like `num` in the above example) are what the programmer passes into the actions.
 
 ### 2. create a store
 ```javascript
+import ReactDOM from 'react-dom';
 import {createStore, combineReducers} from 'redux';
 import {createReducers, getActions} from 'quick-redux';
 import { Provider } from 'react-redux'
@@ -68,7 +69,7 @@ ReactDOM.render(
 import React, { Component } from 'react';
 import {connect} from 'quick-redux';
 
-//quick-redux passes an object containing all actions as a third argument to connect
+//quick-redux connect passes an object containing all actions as a third argument to connect
 const enhance = connect((state, ownProps, actions) => {
   console.log(state);
   /*
@@ -104,6 +105,113 @@ const CounterComponent = ({counter, actions}) => (
 )
 
 export default enhance(CounterComponent);
+```
+
+
+## more complex example
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {createStore, combineReducers} from 'redux';
+import {createReducers, getActions} from 'quick-redux';
+import { Provider } from 'react-redux'
+
+const todoModule = {
+  defaultState: {
+    todos: [],
+    loading: false
+  },
+  actions: { //the action creators of these actions are prefixed with the module key, so they are scoped to the todoModule
+    addTodo(state, todo) {
+      state.todos.push(todo)
+    },
+    removeTodo(state, index) {
+      state.todos = state.todos.splice(index, 1);
+    },
+    setLoading(state, loading) {
+      state.loading = loading;
+    }
+  },
+  globalActions: { //these actions are not prefixed, so if you call reset on any module, this action handler will be run
+    reset(state) {
+      state.todos = [];
+      state.loading = false;
+    }
+  },
+  asyncActions: {
+    async loadTodos({actions, api}) {
+      const todos = await api.loadTodos();
+      todos.forEach(todo => actions.addTodo);
+    }
+  },
+  key: 'todoList'
+};
+
+const counterModule = {
+  defaultState: {
+    count: 0
+  },
+  actions: {
+    increment: (state, num = 1) => state.count = state.count + num,
+    decrement: (state, num = 1) => state.count = state.count - num,
+  },
+  globalActions: {
+    reset: (state) => state.count = 0
+  },
+  key: 'counter'
+};
+
+const modules = {
+  counter: counterModule,
+  todoList: todoModule
+}
+
+const api = {
+  loadTodos() {
+    return new Promise((resolve) => {
+      resolve([{id:1, text: 'finish something'}])
+    });
+  }
+}
+
+const reducers = createReducers(modules);
+const store = createStore(combineReducers(reducers));
+
+//anything passed into the third argument of get actions will all be passed into asyncAction handlers on any module
+const actions = getActions(modules, store, {api});
+
+async function run() {
+  await actions.todos.loadTodos();
+  actions.counter.increment(1000);
+  console.log(store.getState());
+  /*
+    {
+      counter: {
+        count: 1000
+      },
+      todoList: {
+        loading: false,
+        todos: [{...}]
+      }
+    }
+   */
+  actions.todoList.reset();
+  console.log(store.getState());
+  /*
+    {
+      counter: {
+        count: 0
+      },
+      todoList: {
+        loading: false,
+        todos: []
+      }
+    }
+   */
+}
+run();
+
 ```
 
 
