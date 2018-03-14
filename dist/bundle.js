@@ -1,6 +1,7 @@
 'use strict';
 
 var reactRedux = require('react-redux');
+var redux = require('redux');
 
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
@@ -65,6 +66,7 @@ var getDefWithDefaults = function getDefWithDefaults(def) {
         defaultState: {},
         actions: [],
         globalActions: [],
+        asyncActions: [],
         key: ''
     }, def);
 };
@@ -412,18 +414,12 @@ function produceProxy(baseState, producer) {
         // execute the thunk
         var returnValue = producer.call(rootProxy, rootProxy);
         // and finalize the modified proxy
-        var result = void 0;
+        var result = finalize(rootProxy);
         // check whether the draft was modified and/or a value was returned
         if (returnValue !== undefined && returnValue !== rootProxy) {
             // something was returned, and it wasn't the proxy itself
             if (rootProxy[PROXY_STATE].modified) throw new Error(RETURNED_AND_MODIFIED_ERROR);
-
-            // See #117
-            // Should we just throw when returning a proxy which is not the root, but a subset of the original state?
-            // Looks like a wrongly modeled reducer
-            result = finalize(returnValue);
-        } else {
-            result = finalize(rootProxy);
+            result = returnValue;
         }
         // revoke all proxies
         each(proxies, function (_, p) {
@@ -546,21 +542,7 @@ function hasObjectChanges(state) {
 }
 
 function hasArrayChanges(state) {
-    var proxy = state.proxy;
-
-    if (proxy.length !== state.base.length) return true;
-    // See #116
-    // If we first shorten the length, our array interceptors will be removed.
-    // If after that new items are added, result in the same original length,
-    // those last items will have no intercepting property.
-    // So if there is no own descriptor on the last position, we know that items were removed and added
-    // N.B.: splice, unshift, etc only shift values around, but not prop descriptors, so we only have to check
-    // the last one
-    var descriptor = Object.getOwnPropertyDescriptor(proxy, proxy.length - 1);
-    // descriptor can be null, but only for newly created sparse arrays, eg. new Array(10)
-    if (descriptor && !descriptor.get) return true;
-    // For all other cases, we don't have to compare, as they would have been picked up by the index setters
-    return false;
+    return state.proxy.length !== state.base.length;
 }
 
 function produceEs5(baseState, producer) {
@@ -578,13 +560,13 @@ function produceEs5(baseState, producer) {
         // find and mark all changes (for parts not done yet)
         // TODO: store states by depth, to be able guarantee processing leaves first
         markChanges();
-        var result = void 0;
+        var result = finalize(rootProxy);
         // check whether the draft was modified and/or a value was returned
         if (returnValue !== undefined && returnValue !== rootProxy) {
             // something was returned, and it wasn't the proxy itself
             if (rootProxy[PROXY_STATE].modified) throw new Error(RETURNED_AND_MODIFIED_ERROR);
-            result = finalize(returnValue);
-        } else result = finalize(rootProxy);
+            result = returnValue;
+        }
         // make sure all proxies become unusable
         each(states, function (_, state) {
             state.finished = true;
@@ -651,7 +633,7 @@ function produce(baseState, producer) {
         if (typeof producer !== "function") throw new Error("the second argument to produce should be a function");
     }
 
-    // if state is a primitive, don't bother proxying at all and just return whatever the producer returns on that value
+    // it state is a primitive, don't bother proxying at all and just return whatever the producer returns on that value
     if ((typeof baseState === "undefined" ? "undefined" : _typeof$1(baseState)) !== "object" || baseState === null) return producer(baseState);
     if (!isProxyable(baseState)) throw new Error("the first argument to an immer producer should be a primitive, plain object or array, got " + (typeof baseState === "undefined" ? "undefined" : _typeof$1(baseState)) + ": \"" + baseState + "\"");
     return getUseProxies() ? produceProxy(baseState, producer) : produceEs5(baseState, producer);
@@ -704,6 +686,20 @@ function easyConnect$1() {
   });
 }
 
+function getStore(modules) {
+  var argsToPassToAsyncActions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var reducers = createReducers(modules);
+  var store = redux.createStore(redux.combineReducers(reducers));
+  //anything passed into the third argument of get actions will all be passed into asyncAction handlers on any module
+  var actions = getActions(modules, store, argsToPassToAsyncActions);
+  store.actions = actions;
+  return store;
+}
+
+var connect = easyConnect;
+var quickConnect = easyConnect$1;
+
 var index = {
   connectWithActions: easyConnect,
   getActions: getActions,
@@ -711,7 +707,10 @@ var index = {
   generateActionCreators: generateActionCreators,
   createReducer: createReducer,
   createReducers: createReducers,
-  easyConnect: easyConnect$1
+  connect: connect,
+  easyConnect: easyConnect$1,
+  quickConnect: quickConnect,
+  createStore: getStore
 };
 
 module.exports = index;
