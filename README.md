@@ -38,7 +38,11 @@ export default counterModule;
 
 quick-redux uses immer (https://github.com/mweststrate/immer) handle state modifications.  After modifying the state, a new state is produced with the modifications.   Each action is passed the current state as it's first parameter, and then following parameters (like `num` in the above example) are what the programmer passes into the actions.
 
-### 2. create a store
+### 2. convert our module to a reducer and actions
+
+`createReducers` takes module(s) as an argument and returns reducers
+`getActions` takes module(s) and a store as arguments and returns an object of actions
+
 ```javascript
 import ReactDOM from 'react-dom';
 import {createStore, combineReducers} from 'redux';
