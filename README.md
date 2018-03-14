@@ -2,7 +2,9 @@
 
 A helper to make redux state management a little less complicated 
 
-inpired by: https://github.com/vuejs/vuex
+inpired by: 
+* [Vuex](http://vuex.vuejs.org/en/intro.html)
+* [immer](https://github.com/mweststrate/immer)
 
 ## Getting started
 
@@ -36,7 +38,7 @@ const counterModule = {
 export default counterModule;
 ```
 
-quick-redux uses immer (https://github.com/mweststrate/immer) handle state modifications.  After modifying the state, a new state is produced with the modifications.   Each action is passed the current state as it's first parameter, and then following parameters (like `num` in the above example) are what the programmer passes into the actions.
+quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state modifications.  it doesn't matter what an action returns, just modify the current state and immer will create the next immutable state
 
 ### 2. create a store from our modules
 
