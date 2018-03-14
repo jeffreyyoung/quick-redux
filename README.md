@@ -110,7 +110,7 @@ export default enhance(CounterComponent);
 
 
 ## more complex example
-this shows how to generate reducers and action creators from our modules so that you can include any redux middleware
+this shows how to generate reducers using `createReducers` and action creators using `getActions` from our modules so that any redux middleware can be used with our store
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
