@@ -95,9 +95,9 @@ const enhance = connect((state, ownProps, actions) => {
   };
 })
 
-const CounterComponent = ({counter, actions}) => (
+const CounterComponent = ({count, actions}) => (
   <div>
-    <h1>Count: {counter.count}</h1>
+    <h1>Count: {count}</h1>
     <button onClick={actions.increment}>increment</button>
     <button onClick={actions.decrement}>decrement</button>
     <button onClick={() => actions.increment(10000)}>INCREMENT BY 10,000!!!111!!!1</button>
