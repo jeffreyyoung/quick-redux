@@ -142,7 +142,7 @@ const todoModule = {
   asyncActions: {
     async loadTodos({actions, api}) {
       const todos = await api.loadTodos();
-      todos.forEach(todo => actions.addTodo);
+      todos.forEach(todo => actions.addTodo(todo));
     }
   },
   key: 'todoList'
