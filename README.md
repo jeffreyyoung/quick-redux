@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jeffreyyoung/quick-redux.svg?branch=master)](https://travis-ci.org/jeffreyyoung/quick-redux)
+
 # quick-redux
 
 A helper to make redux state management a little less complicated. Rather than dealing with actionCreators, dispatch, and reducers, you create modules to handle state.
