@@ -1,6 +1,6 @@
 # quick-redux
 
-A helper to make redux state management a little less complicated 
+A helper to make redux state management a little less complicated. Rather than dealing with actionCreators, dispatch, and reducers, you create modules to handle state.
 
 inpired by: 
 * [Vuex](http://vuex.vuejs.org/en/intro.html)
@@ -101,8 +101,8 @@ const enhance = connect((state, ownProps, actions) => {
 const CounterComponent = ({count, actions}) => (
   <div>
     <h1>Count: {count}</h1>
-    <button onClick={actions.increment}>increment</button>
-    <button onClick={actions.decrement}>decrement</button>
+    <button onClick={() => actions.increment()}>increment</button>
+    <button onClick={() => actions.decrement()}>decrement</button>
     <button onClick={() => actions.increment(10000)}>INCREMENT BY 10,000!!!111!!!1</button>
   </div>
 )
