@@ -6,6 +6,7 @@ import createReducer from './createReducer';
 import createReducers from './createReducers';
 import easyConnect from './easyConnect';
 const connect = connectWithActions;
+const quickConnect = easyConnect;
 export default {
   connectWithActions,
   getActions,
@@ -14,5 +15,6 @@ export default {
   createReducer,
   createReducers,
   connect,
-  easyConnect
+  easyConnect,
+  quickConnect
 }
