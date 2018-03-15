@@ -50,8 +50,6 @@ quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state m
 import ReactDOM from 'react-dom';
 import {createStore} from 'quick-redux';
 import { Provider } from 'react-redux'
-import App from './App';
-import counterModule from './counterModule';
 
 //create a store
 const store = createStore({
