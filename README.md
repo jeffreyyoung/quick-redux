@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/jeffreyyoung/quick-redux.svg?branch=master)](https://travis-ci.org/jeffreyyoung/quick-redux)
 
-![Quick Redux](/jeffreyyoung/quick-redux/master/examples/icon.png "quick redux")
+![Quick Redux](https://raw.githubusercontent.com/jeffreyyoung/quick-redux/master/examples/icon.png "quick redux")
 
 # quick-redux
 
