@@ -1,6 +1,7 @@
 // rollup.config.js
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
+import istanbul from 'rollup-plugin-istanbul';
 import pkg from './package.json';
 
 export default {
@@ -16,6 +17,9 @@ export default {
         moduleDirectory: 'node_modules'
       }
     }),
+    // istanbul({
+    //   exclude: ['test/**']
+    // }), TODO figure out coverage
     babel({
       exclude: 'node_modules/**'
     })

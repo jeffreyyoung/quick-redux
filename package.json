@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha",
     "build": "rollup -c",
-    "cover": "istanbul cover _mocha",
+    "coverage": "istanbul cover _mocha",
     "pretest": "npm run build"
   },
   "author": "",
@@ -21,6 +21,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
+    "istanbul": "^0.4.5",
     "mocha": "^5.0.4",
     "react": "^16.2.0",
     "react-redux": "^5.0.7",
@@ -28,6 +29,7 @@
     "rollup": "^0.56.3",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-istanbul": "^2.0.1",
     "rollup-plugin-node-resolve": "^3.2.0"
   },
   "dependencies": {
