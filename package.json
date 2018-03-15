@@ -4,8 +4,10 @@
   "description": "",
   "main": "dist/bundle.js",
   "scripts": {
-    "test": "echo \"OMG THE TESTS PASSED\"",
-    "build": "rollup -c"
+    "test": "mocha",
+    "build": "rollup -c",
+    "cover": "istanbul cover _mocha",
+    "pretest": "npm run build"
   },
   "author": "",
   "license": "ISC",
@@ -19,11 +21,13 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2017": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
+    "mocha": "^5.0.4",
     "react": "^16.2.0",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "rollup": "^0.56.3",
     "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.2.0"
   },
   "dependencies": {

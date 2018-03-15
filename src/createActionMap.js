@@ -36,7 +36,7 @@ const getActionKeyWithoutPrefix = (key) => key.substring(
   
 //adds a prefix to the action key
 const prefixKey = (key, prefix) => `${prefix}${separator}${key}`;
-
+createActionMap.separator = separator;
 export default createActionMap;
 export {
   isGlobalKey, getKeyWithoutPrefix, prefixKey
