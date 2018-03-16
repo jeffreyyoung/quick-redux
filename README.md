@@ -10,16 +10,7 @@ inpired by:
 
 ## Getting started
 
-`npm install --save quick-redux`
-
-React, redux and react-redux also must be installed to use quick-redux. If you were starting a project from scratch you could run
-
-```
-  npx create-react-app quick-redux-test
-  cd quick-redux-test
-  npm i --save redux react-redux quick-redux
-  npm start
-```
+`npm install --save quick-redux redux react-redux`
 
 ## Simple example
 
@@ -74,24 +65,6 @@ import {connect} from 'quick-redux';
 
 //quick-redux connect passes an object containing all actions as a third argument to connect
 const enhance = connect((state, ownProps, actions) => {
-  console.log(state);
-  /*
-    {
-      counter: {
-        count: 0
-      }
-    }
-   */
-  
-  console.log(actions);
-  /*
-    {
-      counter: {
-        increment(count),
-        decrement(count)
-      }
-    }
-   */
   return {
     count: state.counter.count,
     actions: actions.counter
