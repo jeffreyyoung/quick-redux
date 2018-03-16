@@ -4,10 +4,6 @@
 
 Handle your state with modules.  Rather than writing actions, and reducers, just write modules.
 
-inpired by: 
-* [Vuex](http://vuex.vuejs.org/en/intro.html)
-* [immer](https://github.com/mweststrate/immer)
-
 ## Getting started
 
 `npm install --save quick-redux redux react-redux`
@@ -190,4 +186,8 @@ run();
 
 ```
 
+
+inpired by: 
+* [Vuex](http://vuex.vuejs.org/en/intro.html)
+* [immer](https://github.com/mweststrate/immer)
 
