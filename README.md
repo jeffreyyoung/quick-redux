@@ -1,10 +1,8 @@
 [![Build Status](https://travis-ci.org/jeffreyyoung/quick-redux.svg?branch=master)](https://travis-ci.org/jeffreyyoung/quick-redux)
 
-![Quick Redux](https://raw.githubusercontent.com/jeffreyyoung/quick-redux/master/examples/icon.png "quick redux")
-
 # quick-redux
 
-A helper to make redux state management a little less complicated. Rather than dealing with actionCreators, dispatch, and reducers, you create modules to handle state.
+Handle your state with modules.  Rather than writing actions, and reducers, just write modules.
 
 inpired by: 
 * [Vuex](http://vuex.vuejs.org/en/intro.html)
@@ -42,7 +40,7 @@ const counterModule = {
 export default counterModule;
 ```
 
-quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state modifications.  it doesn't matter what an action returns, just modify the current state and immer will create the next immutable state
+quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state modifications.  it doesn't matter what an action returns, just modify the state passed into the action.
 
 ### 2. create a store from our modules
 
