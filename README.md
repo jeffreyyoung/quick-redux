@@ -2,24 +2,11 @@
 
 # quick-redux
 
-A helper to make redux state management a little less complicated. Rather than dealing with actionCreators, dispatch, and reducers, you create modules to handle state.
-
-inpired by: 
-* [Vuex](http://vuex.vuejs.org/en/intro.html)
-* [immer](https://github.com/mweststrate/immer)
+Handle your state with modules.  Rather than writing actions, and reducers, just write modules.
 
 ## Getting started
 
-`npm install --save quick-redux`
-
-React, redux and react-redux also must be installed to use quick-redux. If you were starting a project from scratch you could run
-
-```
-  npx create-react-app quick-redux-test
-  cd quick-redux-test
-  npm i --save redux react-redux quick-redux
-  npm start
-```
+`npm install --save quick-redux redux react-redux`
 
 ## Simple example
 
@@ -47,7 +34,7 @@ const counterModule = {
 export default counterModule;
 ```
 
-quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state modifications.  it doesn't matter what an action returns, just modify the current state and immer will create the next immutable state
+quick-redux uses [immer](https://github.com/mweststrate/immer) to handle state modifications.  it doesn't matter what an action returns, just modify the state passed into the action.
 
 ### 2. create a store from our modules
 
@@ -203,4 +190,8 @@ run();
 
 ```
 
+
+inpired by: 
+* [Vuex](http://vuex.vuejs.org/en/intro.html)
+* [immer](https://github.com/mweststrate/immer)
 
