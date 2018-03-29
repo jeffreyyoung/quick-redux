@@ -68,15 +68,16 @@ import {inject} from 'quick-redux';
 
 const enhance = inject(
   //path to your selector .ie moduleKey.selectorName
-  'counter'
+  'counter.countWithActionsAndIsEven'
 );
 
-const CounterComponent = ({counter, actions}) => (
+const CounterComponent = ({count, isEven, actions}) => (
   <div>
-    <h1>Count: {counter.count}</h1>
-    <button onClick={() => actions.counter.increment()}>increment</button>
-    <button onClick={() => actions.counter.decrement()}>decrement</button>
-    <button onClick={() => actions.counter.increment(10000)}>INCREMENT BY 10,000!!!111!!!1</button>
+    <h1>Count: {count}</h1>
+    <h3>Is Even: {isEven}</h3>
+    <button onClick={() => actions.increment()}>increment</button>
+    <button onClick={() => actions.decrement()}>decrement</button>
+    <button onClick={() => actions.increment(10000)}>INCREMENT BY 10,000!!!111!!!1</button>
   </div>
 )
 

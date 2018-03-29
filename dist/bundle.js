@@ -762,6 +762,7 @@ var createSelectors = function createSelectors(defs) {
   var selectors = {};
   Object.values(defs).forEach(function (defIn) {
     var def = getDefWithDefaults(defIn);
+    var actions = registry$1.get('actions');
     selectors[defIn.key] = {};
     Object.entries(def.selectors).forEach(function (_ref) {
       var _ref2 = slicedToArray(_ref, 2),
@@ -769,7 +770,7 @@ var createSelectors = function createSelectors(defs) {
           selectorFn = _ref2[1];
 
       selectors[def.key][selectorName] = function (state) {
-        return selectorFn(state[def.key], state);
+        return selectorFn(state[def.key], state, actions);
       };
     });
   });
