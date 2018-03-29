@@ -100,6 +100,5 @@ describe('create store should properly create a store with all modules as reduce
   it('actions should work', function() {
     assert.equal(typeof store.selectors.counter.isZero, 'function');
     assert.equal(store.selectors.counter.isZero(store.getState()).isZero, true);
-    
-  })
+  });
 });

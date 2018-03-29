@@ -19,7 +19,9 @@
     "redux": "^3.7.2"
   },
   "nodemonConfig": {
-    "ignore": ["dist/*"],
+    "ignore": [
+      "dist/*"
+    ],
     "delay": "2500"
   },
   "devDependencies": {

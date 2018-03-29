@@ -11,11 +11,14 @@ function selectFromState(state, selectorKeys, selectors) {
   selectorKeys.forEach(key => {
     try {
       const keys = key.split('.');
-      next = {
-        ...next,
-        ...selectors[keys[0]][keys[1]](state)
+      if (keys.length === 1) {
+        next[keys[0]] = state[keys[0]];
+      } else if (keys.length === 2) {
+        next = {
+          ...next,
+          ...selectors[keys[0]][keys[1]](state)
+        }
       }
-      console.log('selecting', selectors[keys[0]][keys[1]](state));
     } catch(e) {
       console.error(e);
     }

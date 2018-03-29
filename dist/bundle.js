@@ -677,24 +677,32 @@ function createHiddenProperty(target, prop, value) {
  * @returns {any} a new state, or the base state if nothing was modified
  */
 function produce(baseState, producer) {
+    // prettier-ignore
+    if (arguments.length !== 1 && arguments.length !== 2) throw new Error("produce expects 1 or 2 arguments, got " + arguments.length);
+
     // curried invocation
-    if (arguments.length === 1) {
-        var _producer = baseState;
+    if (typeof baseState === "function") {
         // prettier-ignore
-        if (typeof _producer !== "function") throw new Error("if produce is called with 1 argument, the first argument should be a function");
+        if (typeof producer === "function") throw new Error("if first argument is a function (curried invocation), the second argument to produce cannot be a function");
+
+        var initialState = producer;
+        var recipe = baseState;
+
         return function () {
             var args = arguments;
-            return produce(args[0], function (draft) {
+
+            var currentState = args[0] === undefined && initialState !== undefined ? initialState : args[0];
+
+            return produce(currentState, function (draft) {
                 args[0] = draft; // blegh!
-                return _producer.apply(draft, args);
+                return recipe.apply(draft, args);
             });
         };
     }
 
     // prettier-ignore
     {
-        if (arguments.length !== 2) throw new Error("produce expects 1 or 2 arguments, got " + arguments.length);
-        if (typeof producer !== "function") throw new Error("the second argument to produce should be a function");
+        if (typeof producer !== "function") throw new Error("if first argument is not a function, the second argument to produce should be a function");
     }
 
     // if state is a primitive, don't bother proxying at all and just return whatever the producer returns on that value
@@ -787,8 +795,11 @@ function selectFromState(state, selectorKeys, selectors) {
   selectorKeys.forEach(function (key) {
     try {
       var keys = key.split('.');
-      next = _extends({}, next, selectors[keys[0]][keys[1]](state));
-      console.log('selecting', selectors[keys[0]][keys[1]](state));
+      if (keys.length === 1) {
+        next[keys[0]] = state[keys[0]];
+      } else if (keys.length === 2) {
+        next = _extends({}, next, selectors[keys[0]][keys[1]](state));
+      }
     } catch (e) {
       console.error(e);
     }
