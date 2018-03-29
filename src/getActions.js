@@ -1,6 +1,6 @@
 import bindActionCreators from './bindActionCreators';
 import generateActionCreators from './generateActionCreators';
-import { registerActions } from './connectWithActions';
+import registry from './registry';
 const getActions = (defs, store, additionalParams = {}) => {
   const actions = {};
   
@@ -15,8 +15,7 @@ const getActions = (defs, store, additionalParams = {}) => {
       ...additionalParams
     });
   });
-  
-  registerActions(actions);
+  registry.set('actions', actions);
   return actions;
 }
 

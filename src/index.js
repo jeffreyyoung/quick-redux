@@ -8,10 +8,11 @@ import easyConnect from './easyConnect';
 const connect = connectWithActions;
 const quickConnect = easyConnect;
 import createStore from './createStore';
-
+import inject from './inject';
 export default {
   connectWithActions,
   getActions,
+  inject,
   createActionMap,
   generateActionCreators,
   createReducer,

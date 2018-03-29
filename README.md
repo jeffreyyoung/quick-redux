@@ -34,6 +34,13 @@ const counterModule = {
     increment: (state, num = 1) => state.count = state.count + num,
     decrement: (state, num = 1) => state.count = state.count - num,
   },
+  selectors: {
+    countWithActionsAndIsEven: (state, globalState, actions) => ({
+      count: state.count,
+      isEven: (state.count % 2) === 0,
+      actions: actions.counter
+    })
+  },
   key: 'counter'
 }
 
@@ -70,35 +77,14 @@ ReactDOM.render(
 ```javascript
 
 import React, { Component } from 'react';
-import {connect} from 'quick-redux';
+import {inject} from 'quick-redux';
 
-//quick-redux connect passes an object containing all actions as a third argument to connect
-const enhance = connect((state, ownProps, actions) => {
-  console.log(state);
-  /*
-    {
-      counter: {
-        count: 0
-      }
-    }
-   */
-  
-  console.log(actions);
-  /*
-    {
-      counter: {
-        increment(count),
-        decrement(count)
-      }
-    }
-   */
-  return {
-    count: state.counter.count,
-    actions: actions.counter
-  };
-})
+const enhance = inject(
+  //path to your selector .ie moduleKey.selectorName
+  'counter.countWithActionsAndIsEven'
+);
 
-const CounterComponent = ({count, actions}) => (
+const CounterComponent = ({count, isEven, actions}) => (
   <div>
     <h1>Count: {count}</h1>
     <button onClick={() => actions.increment()}>increment</button>

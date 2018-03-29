@@ -7,13 +7,20 @@
     "test": "mocha",
     "build": "rollup -c",
     "coverage": "istanbul cover _mocha",
-    "pretest": "npm run build"
+    "pretest": "npm run build",
+    "dev": "nodemon --exec npm run buildAndTest",
+    "dev1": "mocha -w -R spec",
+    "buildAndTest": "rollup -c && mocha"
   },
   "author": "",
   "license": "ISC",
   "peerDependencies": {
     "react-redux": "^5.0.7",
     "redux": "^3.7.2"
+  },
+  "nodemonConfig": {
+    "ignore": ["dist/*"],
+    "delay": "2500"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

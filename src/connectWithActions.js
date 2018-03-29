@@ -1,15 +1,10 @@
 import {connect} from 'react-redux';
-
-let actions = {};
-
-export function registerActions(actionsIn) {
-  actions = actionsIn;
-}
+import registry from './registry';
 
 export default function easyConnect(...args) {
   let nextArgs = [...args];
   nextArgs[0] = function(...mapStateToPropsArguments) {
-    return args[0](...mapStateToPropsArguments, actions);
+    return args[0](...mapStateToPropsArguments, registry.get('actions'));
   }
   return connect(...nextArgs);
 }

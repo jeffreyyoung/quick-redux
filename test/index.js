@@ -12,6 +12,13 @@ const counterModule = {
     decrement: (state, num) => state.count = state.count - num,
     reset: (state) => state.count = 0
   },
+  selectors: {
+    isZero(state, globalState) {
+      return {
+        isZero: state.count === 0
+      };
+    }
+  },
   key: 'counter'
 }
 
@@ -89,4 +96,10 @@ describe('create store should properly create a store with all modules as reduce
     assert.equal(store.getState().counter.count, counterModule.defaultState.count);
     assert.equal(store.getState().list.list.length, listModule.defaultState.list.length);
   });
+  
+  it('actions should work', function() {
+    assert.equal(typeof store.selectors.counter.isZero, 'function');
+    assert.equal(store.selectors.counter.isZero(store.getState()).isZero, true);
+    
+  })
 });

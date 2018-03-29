@@ -1,8 +1,9 @@
 const getDefWithDefaults = (def) => ({
     defaultState: {},
-    actions: [],
-    globalActions: [],
-    asyncActions: [],
+    actions: {},
+    globalActions: {},
+    asyncActions: {},
+    selectors: {},
     key: '',
     ...def
   });

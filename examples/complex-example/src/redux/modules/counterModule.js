@@ -9,6 +9,10 @@ const counterModule = {
   globalActions: {
     reset: (state) => state.count = 0
   },
+  selectors: {
+    isOdd: (state) => (state.count%2) === 0,
+    count: (state) => state.count
+  },
   key: 'counter'
 };
 

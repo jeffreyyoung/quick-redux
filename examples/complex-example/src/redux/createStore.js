@@ -11,6 +11,7 @@ const modules = {
 };
 
 function getStore() {
+  console.log('create store');
   return createStore(modules, {api});
 }
 

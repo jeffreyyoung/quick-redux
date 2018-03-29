@@ -1,21 +1,17 @@
 import React, { Component } from 'react';
-import {connect} from 'quick-redux';
+import {connect, inject} from 'quick-redux';
 
-console.log('CONNECT!!!', connect);
-
-const App = ({count, actions}) => (
+const App = (props) => (
   <div>
-    <p>{count}</p>
-    <button onClick={() => actions.increment()}>increment</button>
-    <button onClick={() => actions.decrement()}>decrement</button>
+    <div>{JSON.stringify(props, null, 3)}</div>
+    <p>{props.count}</p>
+    <button onClick={() => props.actions.counter.increment()}>increment</button>
+    <button onClick={() => props.actions.counter.decrement()}>decrement</button>
   </div>
 )
 
-const enhance = connect(
-  (state, ownProps, actions) => ({
-    count: state.counter.count,
-    actions: actions.counter,
-  })
+const enhance = inject(
+  'counter.isOdd'
 );
 
 export default enhance(App);

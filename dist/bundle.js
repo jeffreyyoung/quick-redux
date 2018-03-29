@@ -3,6 +3,17 @@
 var reactRedux = require('react-redux');
 var redux = require('redux');
 
+var registry = {};
+
+var registry$1 = {
+  set: function set(key, object) {
+    registry[key] = object;
+  },
+  get: function get(key) {
+    return registry[key];
+  }
+};
+
 var _extends = Object.assign || function (target) {
   for (var i = 1; i < arguments.length; i++) {
     var source = arguments[i];
@@ -29,6 +40,44 @@ var objectWithoutProperties = function (obj, keys) {
   return target;
 };
 
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
     for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -38,12 +87,6 @@ var toConsumableArray = function (arr) {
     return Array.from(arr);
   }
 };
-
-var actions = {};
-
-function registerActions(actionsIn) {
-  actions = actionsIn;
-}
 
 function easyConnect() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -56,7 +99,7 @@ function easyConnect() {
       mapStateToPropsArguments[_key2] = arguments[_key2];
     }
 
-    return args[0].apply(args, mapStateToPropsArguments.concat([actions]));
+    return args[0].apply(args, mapStateToPropsArguments.concat([registry$1.get('actions')]));
   };
   return reactRedux.connect.apply(undefined, toConsumableArray(nextArgs));
 }
@@ -64,9 +107,10 @@ function easyConnect() {
 var getDefWithDefaults = function getDefWithDefaults(def) {
     return _extends({
         defaultState: {},
-        actions: [],
-        globalActions: [],
-        asyncActions: [],
+        actions: {},
+        globalActions: {},
+        asyncActions: {},
+        selectors: {},
         key: ''
     }, def);
 };
@@ -184,8 +228,7 @@ var getActions = function getActions(defs, store) {
       key: key
     }, additionalParams));
   });
-
-  registerActions(actions);
+  registry$1.set('actions', actions);
   return actions;
 };
 
@@ -707,6 +750,25 @@ function easyConnect$1() {
   });
 }
 
+var createSelectors = function createSelectors(defs) {
+  var selectors = {};
+  Object.values(defs).forEach(function (defIn) {
+    var def = getDefWithDefaults(defIn);
+    selectors[defIn.key] = {};
+    Object.entries(def.selectors).forEach(function (_ref) {
+      var _ref2 = slicedToArray(_ref, 2),
+          selectorName = _ref2[0],
+          selectorFn = _ref2[1];
+
+      selectors[def.key][selectorName] = function (state) {
+        return selectorFn(state[def.key], state);
+      };
+    });
+  });
+  registry$1.set('selectors', selectors);
+  return selectors;
+};
+
 function getStore(modules) {
   var argsToPassToAsyncActions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -714,16 +776,45 @@ function getStore(modules) {
   var store = redux.createStore(redux.combineReducers(reducers));
   //anything passed into the third argument of get actions will all be passed into asyncAction handlers on any module
   var actions = getActions(modules, store, argsToPassToAsyncActions);
+  var selectors = createSelectors(modules, store);
   store.actions = actions;
+  store.selectors = selectors;
   return store;
+}
+
+function selectFromState(state, selectorKeys, selectors) {
+  var next = {};
+  selectorKeys.forEach(function (key) {
+    try {
+      var keys = key.split('.');
+      next = _extends({}, next, selectors[keys[0]][keys[1]](state));
+      console.log('selecting', selectors[keys[0]][keys[1]](state));
+    } catch (e) {
+      console.error(e);
+    }
+  });
+  return next;
+}
+
+function inject() {
+  for (var _len = arguments.length, keys = Array(_len), _key = 0; _key < _len; _key++) {
+    keys[_key] = arguments[_key];
+  }
+
+  return easyConnect(function (state, ownProps, actions) {
+    var selectors = registry$1.get('selectors');
+    return _extends({}, selectFromState(state, keys, selectors), {
+      actions: actions
+    });
+  });
 }
 
 var connect = easyConnect;
 var quickConnect = easyConnect$1;
-
 var index = {
   connectWithActions: easyConnect,
   getActions: getActions,
+  inject: inject,
   createActionMap: createActionMap,
   generateActionCreators: generateActionCreators,
   createReducer: createReducer,
