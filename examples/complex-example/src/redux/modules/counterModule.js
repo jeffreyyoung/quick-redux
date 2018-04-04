@@ -11,7 +11,11 @@ const counterModule = {
   },
   selectors: {
     isOdd: (state) => (state.count%2) === 0,
-    count: (state) => state.count
+    stateWithOdd: (state, globalState, actions) => ({
+      count: state.count,
+      isOdd: state.count%2 === 0,
+      actions
+    })
   },
   key: 'counter'
 };

@@ -11,7 +11,7 @@ const App = (props) => (
 )
 
 const enhance = inject(
-  'counter.isOdd'
+  'counter.stateWithOdd'
 );
 
 export default enhance(App);
